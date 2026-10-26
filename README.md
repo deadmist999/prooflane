@@ -18,3 +18,11 @@ npm start
 When `AI_API_KEY` and `AI_MODEL` are set, evidence is evaluated by a structured OpenAI-compatible model call. Without them, the app enters an explicitly labeled deterministic demo mode; it does not represent that heuristic output as an AI decision.
 
 See `docs/scenario.md`, `docs/adr/0001-evidence-gated-capture.md`, and `docs/tech-stack.md` for the product flow and decisions.
+
+## API flow
+
+1. `POST /contracts` with `title`, numeric `amount`, and `acceptanceChecks`.
+2. `POST /contracts/:id/order` and open the returned PayPal sandbox approval URL.
+3. `POST /contracts/:id/authorize` with the approved `orderId`.
+4. `POST /contracts/:id/evidence` with a concrete evidence description.
+5. `POST /contracts/:id/release`; policy rejects unsafe capture attempts with HTTP 409.
