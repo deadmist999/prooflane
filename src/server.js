@@ -1,6 +1,7 @@
 import http from 'node:http';
 import { createContract, attachAuthorization, recordAssessment, releaseDecision, demoAssess } from './proof-engine.js';
 import { PayPalClient } from './paypal-client.js';
+import { AiVerifier } from './ai-verifier.js';
 
 const contracts = new Map();
 const paypal = new PayPalClient({
@@ -9,6 +10,11 @@ const paypal = new PayPalClient({
   clientSecret: process.env.PAYPAL_CLIENT_SECRET,
 });
 const threshold = Number(process.env.AUTO_RELEASE_THRESHOLD ?? 0.9);
+const ai = new AiVerifier({
+  baseUrl: process.env.AI_BASE_URL,
+  apiKey: process.env.AI_API_KEY,
+  model: process.env.AI_MODEL,
+});
 
 async function readJson(request) {
   const chunks = [];
@@ -25,7 +31,12 @@ async function handler(request, response) {
   try {
     const url = new URL(request.url, 'http://localhost');
     if (request.method === 'GET' && url.pathname === '/health') {
-      return send(response, 200, { ok: true, paypalConfigured: paypal.configured(), mode: 'sandbox' });
+      return send(response, 200, {
+        ok: true,
+        paypalConfigured: paypal.configured(),
+        aiConfigured: ai.configured(),
+        mode: 'sandbox',
+      });
     }
     if (request.method === 'POST' && url.pathname === '/contracts') {
       const contract = createContract(await readJson(request));
@@ -47,7 +58,9 @@ async function handler(request, response) {
       return send(response, 200, contract);
     }
     if (request.method === 'POST' && match[2] === 'evidence') {
-      recordAssessment(contract, demoAssess(contract, await readJson(request)));
+      const evidence = await readJson(request);
+      const assessment = ai.configured() ? await ai.assess(contract, evidence) : demoAssess(contract, evidence);
+      recordAssessment(contract, assessment);
       return send(response, 200, contract);
     }
     if (request.method === 'POST' && match[2] === 'release') {

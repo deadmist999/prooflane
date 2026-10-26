@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node src/server.js",
     "test": "node --test",
-    "check": "node --check src/server.js && node --check src/proof-engine.js && node --check src/paypal-client.js"
+    "check": "node --check src/server.js && node --check src/proof-engine.js && node --check src/paypal-client.js && node --check src/ai-verifier.js"
   },
   "engines": {
     "node": ">=20"
