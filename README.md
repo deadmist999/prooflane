@@ -19,6 +19,8 @@ When `AI_API_KEY` and `AI_MODEL` are set, evidence is evaluated by a structured 
 
 See `docs/scenario.md`, `docs/adr/0001-evidence-gated-capture.md`, and `docs/tech-stack.md` for the product flow and decisions.
 
+The PayPal integration has also completed a real end-to-end Sandbox authorization and capture. See [`docs/sandbox-e2e.md`](docs/sandbox-e2e.md) for the non-secret verification record.
+
 ## API flow
 
 1. `POST /contracts` with `title`, numeric `amount`, and `acceptanceChecks`.
