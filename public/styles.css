@@ -198,6 +198,8 @@ code { color: var(--blue); font-family: ui-monospace, monospace; }
 .decision { margin: 24px 0; display: grid; gap: 10px; }
 .check { display: grid; grid-template-columns: 24px 1fr; gap: 10px; align-items: start; padding: 12px 0; border-bottom: 1px solid var(--line); }
 .check-mark { color: var(--acid); font-weight: 900; }
+.check.is-fail .check-mark { color: var(--orange); }
+#retry-evidence { margin-left: 12px; }
 .check p { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
 
 .result { display: grid; grid-template-columns: 170px 1fr; gap: 28px; margin-top: 36px; padding: 22px; border-radius: 14px; background: var(--panel-soft); }
@@ -210,6 +212,35 @@ code { color: var(--blue); font-family: ui-monospace, monospace; }
 
 footer { max-width: 1400px; margin: auto; padding: 0 42px 38px; display: flex; justify-content: space-between; color: #68706c; font-size: 12px; }
 footer a { color: #9da5a1; }
+
+.ledger { margin-top: 42px; padding: 34px 38px 38px; border: 1px solid var(--line); border-radius: 22px; background: var(--panel); }
+.ledger-head { display: flex; justify-content: space-between; align-items: end; gap: 28px; margin-bottom: 22px; }
+.ledger-head h2 { margin: 6px 0 0; font-size: 26px; }
+.ledger-copy { max-width: 430px; margin: 0; color: var(--muted); font-size: 14px; line-height: 1.5; }
+#ledger-grid.ag-theme-quartz-dark {
+  --ag-background-color: var(--panel);
+  --ag-header-background-color: var(--panel-soft);
+  --ag-odd-row-background-color: #171b1a;
+  --ag-border-color: var(--line);
+  --ag-foreground-color: var(--ink);
+  --ag-secondary-foreground-color: var(--muted);
+  --ag-active-color: var(--acid);
+  --ag-font-family: inherit;
+  --ag-font-size: 13px;
+  --ag-wrapper-border-radius: 12px;
+}
+.ledger-empty { color: var(--muted); }
+.pill { display: inline-block; padding: 3px 10px; border-radius: 999px; font: 700 11px ui-monospace, monospace; text-transform: uppercase; letter-spacing: .06em; border: 1px solid var(--line); color: var(--muted); }
+.pill-authorized { color: var(--blue); border-color: rgba(124,184,255,.4); }
+.pill-verified { color: var(--acid); border-color: rgba(201,255,74,.4); }
+.pill-needs_review { color: var(--orange); border-color: rgba(255,117,72,.45); }
+.pill-released { color: #11150d; background: var(--acid); border-color: var(--acid); }
+.meter { display: inline-block; width: 56px; height: 6px; margin-right: 8px; vertical-align: middle; border-radius: 6px; background: var(--line); overflow: hidden; }
+.meter i { display: block; height: 100%; background: var(--acid); }
+@media (max-width: 850px) {
+  .ledger { padding: 24px 18px; }
+  .ledger-head { flex-direction: column; align-items: start; }
+}
 
 @keyframes enter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 

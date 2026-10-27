@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Prooflane releases PayPal milestone payments only after submitted work passes explicit acceptance checks.">
     <title>Prooflane — evidence before release</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%278%27 fill=%27%23c9ff4a%27/%3E%3Ctext x=%2716%27 y=%2722%27 font-size=%2718%27 font-family=%27sans-serif%27 font-weight=%27900%27 text-anchor=%27middle%27 fill=%27%2311150d%27%3EP%3C/text%3E%3C/svg%3E">
     <link rel="stylesheet" href="/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/ag-grid-community@32.3.3/dist/ag-grid-community.min.js"></script>
   </head>
   <body>
     <header class="topbar">
@@ -84,7 +86,7 @@ Evidence contains a verifiable reference</textarea>
             <h3 id="order-title">Reserve the milestone funds</h3>
             <p>Prooflane creates an <code>AUTHORIZE</code> order. Approval reserves sandbox funds; nothing is captured yet.</p>
             <button class="primary" id="create-order" type="button">Create PayPal order <span>→</span></button>
-            <a class="approval-link is-hidden" id="approval-link" target="_blank" rel="noreferrer">Open PayPal approval ↗</a>
+            <a class="approval-link is-hidden" id="approval-link" rel="noreferrer">Approve in PayPal Sandbox →</a>
             <button class="secondary is-hidden" id="authorize-order" type="button">I approved it — authorize order</button>
           </section>
 
@@ -103,6 +105,7 @@ Evidence contains a verifiable reference</textarea>
             <h3 id="release-title">Policy has the final word</h3>
             <div class="decision" id="decision"></div>
             <button class="release" id="release-payment" type="button">Capture authorized payment</button>
+            <button class="secondary is-hidden" id="retry-evidence" type="button">Submit stronger evidence</button>
           </section>
 
           <div class="result is-hidden" id="result" aria-live="polite">
@@ -115,6 +118,17 @@ Evidence contains a verifiable reference</textarea>
 
           <div class="error is-hidden" id="error" role="alert"></div>
         </div>
+      </section>
+
+      <section class="ledger" aria-labelledby="ledger-title">
+        <div class="ledger-head">
+          <div>
+            <p class="kicker">Audit trail</p>
+            <h2 id="ledger-title">Milestone ledger</h2>
+          </div>
+          <p class="ledger-copy">Every contract, its verdict and its PayPal identifiers, in one place. Nothing is captured without a passing row.</p>
+        </div>
+        <div id="ledger-grid" class="ag-theme-quartz-dark"></div>
       </section>
     </main>
 

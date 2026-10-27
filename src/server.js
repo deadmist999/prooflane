@@ -54,8 +54,12 @@ async function handler(request, response) {
         ok: true,
         paypalConfigured: paypal.configured(),
         aiConfigured: ai.configured(),
+        aiModel: ai.configured() ? ai.model : null,
         mode: 'sandbox',
       });
+    }
+    if (request.method === 'GET' && url.pathname === '/contracts') {
+      return send(response, 200, [...contracts.values()].reverse());
     }
     if (request.method === 'POST' && url.pathname === '/contracts') {
       const contract = createContract(await readJson(request));
@@ -63,13 +67,24 @@ async function handler(request, response) {
       return send(response, 201, contract);
     }
 
+    const single = url.pathname.match(/^\/contracts\/([^/]+)$/);
+    if (request.method === 'GET' && single) {
+      const found = contracts.get(single[1]);
+      return found ? send(response, 200, found) : send(response, 404, { error: 'contract_not_found' });
+    }
     const match = url.pathname.match(/^\/contracts\/([^/]+)\/(order|authorize|evidence|release)$/);
     if (!match) return send(response, 404, { error: 'not_found' });
     const contract = contracts.get(match[1]);
     if (!contract) return send(response, 404, { error: 'contract_not_found' });
 
     if (request.method === 'POST' && match[2] === 'order') {
-      return send(response, 201, await paypal.createAuthorizationOrder(contract));
+      const origin = (process.env.PUBLIC_URL ?? `http://${request.headers.host}`).replace(/\/$/, '');
+      const order = await paypal.createAuthorizationOrder(contract, {
+        returnUrl: `${origin}/?contract=${contract.id}`,
+        cancelUrl: `${origin}/?contract=${contract.id}&cancelled=1`,
+      });
+      contract.pendingOrderId = order.orderId;
+      return send(response, 201, order);
     }
     if (request.method === 'POST' && match[2] === 'authorize') {
       const { orderId } = await readJson(request);
@@ -98,6 +113,7 @@ async function handler(request, response) {
 }
 
 const port = Number(process.env.PORT ?? 3210);
-http.createServer(handler).listen(port, '127.0.0.1', () => {
-  console.log(`Prooflane listening on http://127.0.0.1:${port}`);
+const host = process.env.HOST ?? '127.0.0.1';
+http.createServer(handler).listen(port, host, () => {
+  console.log(`Prooflane listening on http://${host}:${port}`);
 });

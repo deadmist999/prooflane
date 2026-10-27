@@ -24,24 +24,38 @@ export class PayPalClient {
     return this.#json(response, 'PayPal OAuth').then((body) => body.access_token);
   }
 
-  async createAuthorizationOrder(contract) {
+  async createAuthorizationOrder(contract, { returnUrl, cancelUrl } = {}) {
     const token = await this.accessToken();
+    const order = {
+      intent: 'AUTHORIZE',
+      purchase_units: [{
+        reference_id: contract.id,
+        description: contract.title,
+        amount: { currency_code: contract.currency, value: contract.amount },
+      }],
+    };
+    if (returnUrl) {
+      order.payment_source = {
+        paypal: {
+          experience_context: {
+            brand_name: 'Prooflane',
+            shipping_preference: 'NO_SHIPPING',
+            user_action: 'CONTINUE',
+            return_url: returnUrl,
+            cancel_url: cancelUrl ?? returnUrl,
+          },
+        },
+      };
+    }
     const response = await this.fetch(`${this.baseUrl}/v2/checkout/orders`, {
       method: 'POST',
       headers: this.#headers(token),
-      body: JSON.stringify({
-        intent: 'AUTHORIZE',
-        purchase_units: [{
-          reference_id: contract.id,
-          description: contract.title,
-          amount: { currency_code: contract.currency, value: contract.amount },
-        }],
-      }),
+      body: JSON.stringify(order),
     });
     const body = await this.#json(response, 'create PayPal order');
     return {
       orderId: body.id,
-      approveUrl: body.links?.find((link) => link.rel === 'approve')?.href ?? null,
+      approveUrl: body.links?.find((link) => link.rel === 'approve' || link.rel === 'payer-action')?.href ?? null,
       status: body.status,
     };
   }

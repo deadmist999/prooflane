@@ -28,7 +28,42 @@ The full demo is: create contract → create PayPal order → approve it with th
 
 `GET /health` reports whether PayPal sandbox credentials are configured. The core release policy is fully testable without credentials. Real sandbox order creation requires `PAYPAL_CLIENT_ID` and `PAYPAL_CLIENT_SECRET`.
 
-When `AI_API_KEY` and `AI_MODEL` are set, evidence is evaluated by a structured OpenAI-compatible model call. Without them, the app enters an explicitly labeled deterministic demo mode; it does not represent that heuristic output as an AI decision.
+### AI verifier
+
+Evidence is assessed by any OpenAI-compatible chat model with structured JSON output. Whatever the model returns is normalized and checked against the contract's acceptance checks; a check the model skipped or answered vaguely fails closed.
+
+Free and local, with [Ollama](https://ollama.com):
+
+```bash
+ollama pull qwen2.5:7b-instruct
+AI_BASE_URL=http://localhost:11434/v1 AI_MODEL=qwen2.5:7b-instruct npm start
+```
+
+A hosted model works the same way (`AI_BASE_URL`, `AI_API_KEY`, `AI_MODEL`), for example OpenAI, Groq or Gemini's OpenAI-compatible endpoint. Without a model the app runs in an explicitly labelled deterministic demo mode and never presents that heuristic as an AI decision.
+
+### Milestone ledger (AG Grid)
+
+Below the workflow, an [AG Grid Community](https://www.ag-grid.com/) ledger lists every contract with its status, passed checks, verifier confidence, model and PayPal order and capture IDs, sortable and filterable, so a buyer can audit why each payment was or wasn't released.
+
+### MCP server for AI agents (agentic commerce)
+
+`src/mcp.js` exposes Prooflane to any MCP client (Claude Desktop, Claude Code, Cursor, …) over stdio, so an agent can hire work and pay for it only against proof:
+
+`create_milestone` → `reserve_payment` (buyer approves in PayPal) → `confirm_authorization` → `submit_evidence` → `release_payment`, plus `list_milestones`.
+
+```json
+{
+  "mcpServers": {
+    "prooflane": { "command": "node", "args": ["/path/to/prooflane/src/mcp.js"], "env": { "PROOFLANE_URL": "http://127.0.0.1:3210" } }
+  }
+}
+```
+
+The release policy stays on the server: an agent cannot capture a payment that the buyer has not authorized or that the evidence does not support.
+
+### Deploy
+
+`render.yaml` deploys the console to Render's free tier. Set the PayPal Sandbox credentials and an AI endpoint as environment variables.
 
 See `docs/scenario.md`, `docs/scenario-demo-console.md`, `docs/adr/0001-evidence-gated-capture.md`, `docs/adr/0002-local-demo-console.md`, and `docs/tech-stack.md` for the product flow and decisions.
 

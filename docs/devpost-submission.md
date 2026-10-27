@@ -16,13 +16,15 @@ Prooflane creates a milestone contract with a price and acceptance checks. It th
 
 An OpenAI-compatible structured verifier evaluates every acceptance check and returns a pass/fail result, reason, and confidence. The model does not control PayPal. Application code permits capture only when every check passed, confidence meets the configured threshold, the authorization belongs to the contract, and the milestone has not already been released. Ambiguous evidence stops for review.
 
-The repository also includes an explicitly labelled deterministic verifier so the policy and UI can be tested locally without paid AI usage. It is a fallback, not presented as an AI result.
+Every assessment lands in a milestone ledger built with AG Grid, and the same flow is available to AI agents through an MCP server: an agent can create a milestone, reserve payment through PayPal, submit proof and get paid only when the proof holds up. That makes Prooflane a trust layer for agentic commerce, where neither side has to trust the other's word.
 
 ## How we built it
 
 - Node.js HTTP server with no runtime dependencies
 - PayPal OAuth 2.0, Orders v2 with `AUTHORIZE`, and Payments v2 authorization capture
-- Pluggable OpenAI-compatible structured verifier
+- Pluggable OpenAI-compatible structured verifier (demo: `qwen2.5:7b-instruct` running locally through Ollama), with output normalization that fails closed
+- AG Grid Community milestone ledger
+- MCP server (stdio JSON-RPC, no dependencies) exposing the payment flow to AI agents
 - Deterministic release state machine with duplicate-capture protection
 - Same-origin HTML, CSS, and JavaScript demo console
 - Node test suite covering AI response handling, PayPal API sequencing, unsafe release rejection, and successful single capture
@@ -35,7 +37,8 @@ PayPal's approval, authorization, and capture are separate lifecycle steps, so t
 
 ## Accomplishments
 
-- Completed a real PayPal Sandbox order, approval, authorization, and capture for USD 1.00 in sandbox funds
+- Completed real PayPal Sandbox order → approval → authorization → AI verification → capture runs, both from the web console and from an AI agent through MCP
+- The AI rejected a vague "trust me" claim (20% confidence, every check failed with reasons) and approved concrete evidence (100%, every check passed)
 - Preserved non-secret order, authorization, and capture identifiers in the public verification record
 - Built a coherent guided console instead of requiring judges to assemble API calls
 - Kept all PayPal credentials server-side and out of the repository
@@ -52,7 +55,9 @@ The next version would add durable contracts, signed evidence artifacts, human r
 ## Tools and APIs
 
 - PayPal Developer Platform: Sandbox OAuth, Orders v2, Payments v2
-- AI: OpenAI-compatible structured chat-completion interface; deterministic local fallback for no-key evaluation
+- AI: OpenAI-compatible structured chat completions; Qwen 2.5 7B Instruct through Ollama in the demo
+- AG Grid Community: milestone ledger
+- Model Context Protocol: agent-facing server
 - Node.js 20+
 - Native browser HTML, CSS, and JavaScript
 
@@ -60,8 +65,8 @@ The next version would add durable contracts, signed evidence artifacts, human r
 
 - Source and run instructions: https://github.com/deadmist999/prooflane
 - Functional demo: run locally from the public repository
-- Demo video: pending public YouTube upload
+- Demo video: YOUTUBE_URL
 
 ## Disclosure
 
-The verified end-to-end payment record used real PayPal Sandbox APIs and sandbox funds. Its evidence assessment used the labelled deterministic fallback because no paid external AI key was configured. The external structured AI path is implemented and covered by automated tests.
+All payments in the demo are PayPal Sandbox transactions with sandbox funds. The AI assessments in the video come from a real model call (Qwen 2.5 7B Instruct, local). Identifiers of the verified runs are in `docs/sandbox-e2e.md`.
