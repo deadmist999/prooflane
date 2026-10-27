@@ -6,8 +6,15 @@ This is an early hackathon MVP. It uses PayPal's sandbox only and never spends r
 
 ## Run
 
+Requirements: Node.js 20+ and a free PayPal Developer Sandbox app.
+
+1. In the PayPal Developer Dashboard, create a Sandbox app and copy its client ID and secret.
+2. Create or select a personal Sandbox test account for approving orders.
+3. Configure the local environment:
+
 ```bash
 cp .env.example .env
+# Add the Sandbox client ID and secret to .env.
 set -a && source .env && set +a
 npm test
 npm start
@@ -15,11 +22,15 @@ npm start
 
 Open `http://127.0.0.1:3210` for the guided browser console.
 
+The full demo is: create contract → create PayPal order → approve it with the personal Sandbox account → authorize → submit evidence → capture. All PayPal activity stays in Sandbox and moves no real money.
+
 `GET /health` reports whether PayPal sandbox credentials are configured. The core release policy is fully testable without credentials. Real sandbox order creation requires `PAYPAL_CLIENT_ID` and `PAYPAL_CLIENT_SECRET`.
 
 When `AI_API_KEY` and `AI_MODEL` are set, evidence is evaluated by a structured OpenAI-compatible model call. Without them, the app enters an explicitly labeled deterministic demo mode; it does not represent that heuristic output as an AI decision.
 
 See `docs/scenario.md`, `docs/scenario-demo-console.md`, `docs/adr/0001-evidence-gated-capture.md`, `docs/adr/0002-local-demo-console.md`, and `docs/tech-stack.md` for the product flow and decisions.
+
+Submission-ready copy and the sub-three-minute recording plan live in `docs/devpost-submission.md` and `docs/demo-video-script.md`.
 
 The PayPal integration has also completed a real end-to-end Sandbox authorization and capture. See [`docs/sandbox-e2e.md`](docs/sandbox-e2e.md) for the non-secret verification record.
 
