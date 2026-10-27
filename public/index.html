@@ -3,139 +3,141 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Prooflane releases PayPal milestone payments only after submitted work passes explicit acceptance checks.">
-    <title>Prooflane — evidence before release</title>
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%278%27 fill=%27%23c9ff4a%27/%3E%3Ctext x=%2716%27 y=%2722%27 font-size=%2718%27 font-family=%27sans-serif%27 font-weight=%27900%27 text-anchor=%27middle%27 fill=%27%2311150d%27%3EP%3C/text%3E%3C/svg%3E">
+    <meta name="description" content="Prooflane holds a PayPal payment for a piece of work and releases it once the delivered evidence passes the agreed acceptance checks.">
+    <title>Prooflane</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23155e46'/%3E%3Cpath d='M10 17l4 4 8-9' stroke='white' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/styles.css">
     <script src="https://cdn.jsdelivr.net/npm/ag-grid-community@32.3.3/dist/ag-grid-community.min.js"></script>
   </head>
   <body>
-    <header class="topbar">
-      <a class="brand" href="/" aria-label="Prooflane home">
-        <span class="brand-mark">P</span>
-        <span>Prooflane</span>
-      </a>
-      <div class="environment">
-        <span class="pulse"></span>
-        PayPal Sandbox
+    <header class="bar">
+      <div class="bar-inner">
+        <a class="logo" href="/">
+          <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7"/><path d="M10 17l4 4 8-9"/></svg>
+          Prooflane
+        </a>
+        <nav aria-label="Main">
+          <a class="is-active" href="/">Milestones</a>
+          <a href="https://github.com/deadmist999/prooflane#mcp-server-for-ai-agents-agentic-commerce" target="_blank" rel="noreferrer">Agents (MCP)</a>
+          <a href="https://github.com/deadmist999/prooflane" target="_blank" rel="noreferrer">Docs</a>
+        </nav>
+        <div class="bar-meta">
+          <span class="env">PayPal Sandbox</span>
+          <span class="verifier" id="verifier">Verifier: checking…</span>
+        </div>
       </div>
     </header>
 
-    <main>
-      <section class="hero">
+    <main class="page">
+      <div class="page-head">
         <div>
-          <p class="eyebrow">Evidence-gated payments</p>
-          <h1>Work gets paid<br>when the proof holds up.</h1>
+          <h1>Milestones</h1>
+          <p>Each payment is held in PayPal until the delivered work passes its acceptance checks.</p>
         </div>
-        <p class="hero-copy">Authorize a milestone, check delivery evidence, and capture only after deterministic policy agrees. AI interprets the work. Code owns the money.</p>
-      </section>
+        <button class="btn btn-ghost" id="new-milestone" type="button">New milestone</button>
+      </div>
 
-      <section class="workspace" aria-label="Payment workflow">
-        <aside class="rail">
-          <p class="rail-label">Release path</p>
-          <ol>
-            <li class="is-current" data-step="contract"><span>01</span><div><strong>Contract</strong><small>Define the promise</small></div></li>
-            <li data-step="order"><span>02</span><div><strong>Authorize</strong><small>Reserve sandbox funds</small></div></li>
-            <li data-step="evidence"><span>03</span><div><strong>Verify</strong><small>Test the evidence</small></div></li>
-            <li data-step="release"><span>04</span><div><strong>Release</strong><small>Capture once</small></div></li>
-          </ol>
-          <div class="principle">
-            <span>Policy</span>
-            <p>Uncertain evidence never releases money automatically.</p>
-          </div>
-        </aside>
-
-        <div class="panel">
-          <div class="panel-head">
-            <div>
-              <p class="kicker">New milestone</p>
-              <h2 id="panel-title">Define what “done” means</h2>
-            </div>
-            <div class="mode-badge" id="verifier-mode">Checking verifier…</div>
-          </div>
-
-          <form id="contract-form" class="stage is-active">
-            <label>
-              Milestone title
-              <input id="title" name="title" value="Deliver a conversion-ready launch page" required>
+      <section class="card detail" aria-live="polite">
+        <div class="detail-main">
+          <form id="create-form" class="create">
+            <h2>New milestone</h2>
+            <label class="field">
+              <span>What will be delivered</span>
+              <input id="title" value="" placeholder="Fix checkout bug #482" required>
             </label>
             <div class="field-row">
-              <label>
-                Amount
-                <input id="amount" name="amount" type="number" min="0.01" step="0.01" value="1.00" required>
+              <label class="field">
+                <span>Amount</span>
+                <input id="amount" type="number" min="0.01" step="0.01" placeholder="120.00" required>
               </label>
-              <label>
-                Currency
-                <select id="currency" name="currency">
-                  <option>USD</option>
-                  <option>EUR</option>
-                  <option>GBP</option>
-                </select>
+              <label class="field">
+                <span>Currency</span>
+                <select id="currency"><option>USD</option><option>EUR</option><option>GBP</option></select>
               </label>
             </div>
-            <label>
-              Acceptance checks <span class="hint">one per line</span>
-              <textarea id="checks" name="checks" rows="4" required>Evidence describes a completed deliverable
-Evidence contains a verifiable reference</textarea>
+            <label class="field">
+              <span>Acceptance checks <em>one per line</em></span>
+              <textarea id="checks" rows="4" placeholder="The failing checkout test now passes in CI" required></textarea>
             </label>
-            <button class="primary" type="submit">Create contract <span>→</span></button>
+            <div class="actions">
+              <button class="btn btn-primary" type="submit">Create milestone</button>
+            </div>
           </form>
 
-          <section id="order-stage" class="stage" aria-labelledby="order-title">
-            <p class="stage-number">02 / Payment authorization</p>
-            <h3 id="order-title">Reserve the milestone funds</h3>
-            <p>Prooflane creates an <code>AUTHORIZE</code> order. Approval reserves sandbox funds; nothing is captured yet.</p>
-            <button class="primary" id="create-order" type="button">Create PayPal order <span>→</span></button>
-            <a class="approval-link is-hidden" id="approval-link" rel="noreferrer">Approve in PayPal Sandbox →</a>
-            <button class="secondary is-hidden" id="authorize-order" type="button">I approved it — authorize order</button>
-          </section>
-
-          <section id="evidence-stage" class="stage" aria-labelledby="evidence-title">
-            <p class="stage-number">03 / Evidence review</p>
-            <h3 id="evidence-title">Show the work</h3>
-            <label>
-              Delivery evidence
-              <textarea id="evidence" rows="5">Evidence describes the completed deliverable and contains a verifiable reference: https://github.com/deadmist999/prooflane</textarea>
-            </label>
-            <button class="primary" id="verify-evidence" type="button">Verify evidence <span>→</span></button>
-          </section>
-
-          <section id="release-stage" class="stage" aria-labelledby="release-title">
-            <p class="stage-number">04 / Deterministic release</p>
-            <h3 id="release-title">Policy has the final word</h3>
-            <div class="decision" id="decision"></div>
-            <button class="release" id="release-payment" type="button">Capture authorized payment</button>
-            <button class="secondary is-hidden" id="retry-evidence" type="button">Submit stronger evidence</button>
-          </section>
-
-          <div class="result is-hidden" id="result" aria-live="polite">
-            <div>
-              <span class="result-label">Current state</span>
-              <strong id="result-status">Draft</strong>
+          <div id="milestone" class="milestone is-hidden">
+            <div class="m-head">
+              <div>
+                <p class="m-id" id="m-id"></p>
+                <h2 id="m-title"></h2>
+              </div>
+              <div class="m-figures">
+                <span class="m-amount" id="m-amount"></span>
+                <span class="pill" id="m-status"></span>
+              </div>
             </div>
-            <dl id="result-meta"></dl>
+
+            <h3 class="label">Acceptance checks</h3>
+            <ul class="checks" id="m-checks"></ul>
+            <p class="confidence is-hidden" id="m-confidence"></p>
+
+            <div class="step" id="step-fund">
+              <h3 class="label">Funding</h3>
+              <p class="step-copy">Hold the payment in PayPal before work starts. Approving the order reserves the money; nothing is charged until release.</p>
+              <div class="actions">
+                <button class="btn btn-primary" id="hold-funds" type="button">Hold with PayPal</button>
+                <a class="btn btn-paypal is-hidden" id="approval-link">Continue to PayPal</a>
+                <span class="working is-hidden" id="authorizing">Confirming the authorization with PayPal…</span>
+              </div>
+            </div>
+
+            <div class="step is-hidden" id="step-evidence">
+              <h3 class="label">Delivery evidence</h3>
+              <textarea id="evidence" rows="4" placeholder="Links, test results, logs, screenshots described in text"></textarea>
+              <p class="hint">The verifier treats claims without concrete results as unverified.</p>
+              <div class="actions">
+                <button class="btn btn-primary" id="submit-evidence" type="button">Submit for review</button>
+              </div>
+            </div>
+
+            <div class="step is-hidden" id="step-release">
+              <h3 class="label">Release</h3>
+              <ul class="policy" id="policy"></ul>
+              <div class="actions">
+                <button class="btn btn-primary" id="release" type="button">Release payment</button>
+              </div>
+            </div>
+
+            <div class="step is-hidden" id="step-done">
+              <div class="paid">
+                <strong id="paid-amount"></strong>
+                <span id="paid-detail"></span>
+              </div>
+            </div>
           </div>
 
-          <div class="error is-hidden" id="error" role="alert"></div>
+          <p class="error is-hidden" id="error" role="alert"></p>
         </div>
+
+        <aside class="activity">
+          <h3 class="label">Activity</h3>
+          <ol class="timeline" id="timeline">
+            <li class="empty">Create a milestone to start.</li>
+          </ol>
+        </aside>
       </section>
 
-      <section class="ledger" aria-labelledby="ledger-title">
+      <section class="card ledger">
         <div class="ledger-head">
-          <div>
-            <p class="kicker">Audit trail</p>
-            <h2 id="ledger-title">Milestone ledger</h2>
-          </div>
-          <p class="ledger-copy">Every contract, its verdict and its PayPal identifiers, in one place. Nothing is captured without a passing row.</p>
+          <h2>All milestones</h2>
+          <span class="ledger-count" id="ledger-count"></span>
         </div>
-        <div id="ledger-grid" class="ag-theme-quartz-dark"></div>
+        <div id="ledger-grid" class="ag-theme-quartz"></div>
       </section>
     </main>
 
-    <footer>
-      <span>Sandbox prototype · no real money</span>
-      <a href="https://github.com/deadmist999/prooflane" target="_blank" rel="noreferrer">Source code ↗</a>
-    </footer>
     <script type="module" src="/app.js"></script>
   </body>
 </html>

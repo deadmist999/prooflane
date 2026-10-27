@@ -1,6 +1,6 @@
 import http from 'node:http';
 import { readFile } from 'node:fs/promises';
-import { createContract, attachAuthorization, recordAssessment, releaseDecision, demoAssess } from './proof-engine.js';
+import { createContract, attachAuthorization, recordAssessment, releaseDecision, demoAssess, logEvent } from './proof-engine.js';
 import { PayPalClient } from './paypal-client.js';
 import { AiVerifier } from './ai-verifier.js';
 
@@ -55,6 +55,7 @@ async function handler(request, response) {
         paypalConfigured: paypal.configured(),
         aiConfigured: ai.configured(),
         aiModel: ai.configured() ? ai.model : null,
+        threshold,
         mode: 'sandbox',
       });
     }
@@ -84,6 +85,7 @@ async function handler(request, response) {
         cancelUrl: `${origin}/?contract=${contract.id}&cancelled=1`,
       });
       contract.pendingOrderId = order.orderId;
+      logEvent(contract, 'order_created', { orderId: order.orderId });
       return send(response, 201, order);
     }
     if (request.method === 'POST' && match[2] === 'authorize') {
@@ -104,6 +106,7 @@ async function handler(request, response) {
       contract.releasedAt = new Date().toISOString();
       contract.status = 'released';
       contract.payment.captureId = capture.id;
+      logEvent(contract, 'captured', { captureId: capture.id });
       return send(response, 200, contract);
     }
     return send(response, 405, { error: 'method_not_allowed' });

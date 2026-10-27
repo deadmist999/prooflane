@@ -20,7 +20,13 @@ export function createContract({ title, amount, currency = 'USD', acceptanceChec
     payment: null,
     assessment: null,
     releasedAt: null,
+    events: [{ type: 'created', at: new Date().toISOString() }],
   };
+}
+
+export function logEvent(contract, type, detail = {}) {
+  (contract.events ??= []).push({ type, at: new Date().toISOString(), ...detail });
+  return contract;
 }
 
 export function attachAuthorization(contract, payment) {
@@ -32,7 +38,7 @@ export function attachAuthorization(contract, payment) {
   }
   contract.payment = { ...payment };
   contract.status = 'authorized';
-  return contract;
+  return logEvent(contract, 'authorized', { authorizationId: payment.authorizationId });
 }
 
 export function recordAssessment(contract, assessment) {
@@ -44,7 +50,12 @@ export function recordAssessment(contract, assessment) {
   }
   contract.assessment = assessment;
   contract.status = assessment.checks.every((check) => check.passed) ? 'verified' : 'needs_review';
-  return contract;
+  return logEvent(contract, 'assessed', {
+    passed: assessment.checks.filter((check) => check.passed).length,
+    total: assessment.checks.length,
+    confidence: assessment.confidence,
+    provider: assessment.provider,
+  });
 }
 
 export function releaseDecision(contract, threshold = 0.9) {
