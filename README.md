@@ -13,11 +13,13 @@ npm test
 npm start
 ```
 
+Open `http://127.0.0.1:3210` for the guided browser console.
+
 `GET /health` reports whether PayPal sandbox credentials are configured. The core release policy is fully testable without credentials. Real sandbox order creation requires `PAYPAL_CLIENT_ID` and `PAYPAL_CLIENT_SECRET`.
 
 When `AI_API_KEY` and `AI_MODEL` are set, evidence is evaluated by a structured OpenAI-compatible model call. Without them, the app enters an explicitly labeled deterministic demo mode; it does not represent that heuristic output as an AI decision.
 
-See `docs/scenario.md`, `docs/adr/0001-evidence-gated-capture.md`, and `docs/tech-stack.md` for the product flow and decisions.
+See `docs/scenario.md`, `docs/scenario-demo-console.md`, `docs/adr/0001-evidence-gated-capture.md`, `docs/adr/0002-local-demo-console.md`, and `docs/tech-stack.md` for the product flow and decisions.
 
 The PayPal integration has also completed a real end-to-end Sandbox authorization and capture. See [`docs/sandbox-e2e.md`](docs/sandbox-e2e.md) for the non-secret verification record.
 

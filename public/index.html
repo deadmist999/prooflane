@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Prooflane releases PayPal milestone payments only after submitted work passes explicit acceptance checks.">
+    <title>Prooflane — evidence before release</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Prooflane home">
+        <span class="brand-mark">P</span>
+        <span>Prooflane</span>
+      </a>
+      <div class="environment">
+        <span class="pulse"></span>
+        PayPal Sandbox
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div>
+          <p class="eyebrow">Evidence-gated payments</p>
+          <h1>Work gets paid<br>when the proof holds up.</h1>
+        </div>
+        <p class="hero-copy">Authorize a milestone, check delivery evidence, and capture only after deterministic policy agrees. AI interprets the work. Code owns the money.</p>
+      </section>
+
+      <section class="workspace" aria-label="Payment workflow">
+        <aside class="rail">
+          <p class="rail-label">Release path</p>
+          <ol>
+            <li class="is-current" data-step="contract"><span>01</span><div><strong>Contract</strong><small>Define the promise</small></div></li>
+            <li data-step="order"><span>02</span><div><strong>Authorize</strong><small>Reserve sandbox funds</small></div></li>
+            <li data-step="evidence"><span>03</span><div><strong>Verify</strong><small>Test the evidence</small></div></li>
+            <li data-step="release"><span>04</span><div><strong>Release</strong><small>Capture once</small></div></li>
+          </ol>
+          <div class="principle">
+            <span>Policy</span>
+            <p>Uncertain evidence never releases money automatically.</p>
+          </div>
+        </aside>
+
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <p class="kicker">New milestone</p>
+              <h2 id="panel-title">Define what “done” means</h2>
+            </div>
+            <div class="mode-badge" id="verifier-mode">Checking verifier…</div>
+          </div>
+
+          <form id="contract-form" class="stage is-active">
+            <label>
+              Milestone title
+              <input id="title" name="title" value="Deliver a conversion-ready launch page" required>
+            </label>
+            <div class="field-row">
+              <label>
+                Amount
+                <input id="amount" name="amount" type="number" min="0.01" step="0.01" value="1.00" required>
+              </label>
+              <label>
+                Currency
+                <select id="currency" name="currency">
+                  <option>USD</option>
+                  <option>EUR</option>
+                  <option>GBP</option>
+                </select>
+              </label>
+            </div>
+            <label>
+              Acceptance checks <span class="hint">one per line</span>
+              <textarea id="checks" name="checks" rows="4" required>Evidence describes a completed deliverable
+Evidence contains a verifiable reference</textarea>
+            </label>
+            <button class="primary" type="submit">Create contract <span>→</span></button>
+          </form>
+
+          <section id="order-stage" class="stage" aria-labelledby="order-title">
+            <p class="stage-number">02 / Payment authorization</p>
+            <h3 id="order-title">Reserve the milestone funds</h3>
+            <p>Prooflane creates an <code>AUTHORIZE</code> order. Approval reserves sandbox funds; nothing is captured yet.</p>
+            <button class="primary" id="create-order" type="button">Create PayPal order <span>→</span></button>
+            <a class="approval-link is-hidden" id="approval-link" target="_blank" rel="noreferrer">Open PayPal approval ↗</a>
+            <button class="secondary is-hidden" id="authorize-order" type="button">I approved it — authorize order</button>
+          </section>
+
+          <section id="evidence-stage" class="stage" aria-labelledby="evidence-title">
+            <p class="stage-number">03 / Evidence review</p>
+            <h3 id="evidence-title">Show the work</h3>
+            <label>
+              Delivery evidence
+              <textarea id="evidence" rows="5">Evidence describes the completed deliverable and contains a verifiable reference: https://github.com/deadmist999/prooflane</textarea>
+            </label>
+            <button class="primary" id="verify-evidence" type="button">Verify evidence <span>→</span></button>
+          </section>
+
+          <section id="release-stage" class="stage" aria-labelledby="release-title">
+            <p class="stage-number">04 / Deterministic release</p>
+            <h3 id="release-title">Policy has the final word</h3>
+            <div class="decision" id="decision"></div>
+            <button class="release" id="release-payment" type="button">Capture authorized payment</button>
+          </section>
+
+          <div class="result is-hidden" id="result" aria-live="polite">
+            <div>
+              <span class="result-label">Current state</span>
+              <strong id="result-status">Draft</strong>
+            </div>
+            <dl id="result-meta"></dl>
+          </div>
+
+          <div class="error is-hidden" id="error" role="alert"></div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <span>Sandbox prototype · no real money</span>
+      <a href="https://github.com/deadmist999/prooflane" target="_blank" rel="noreferrer">Source code ↗</a>
+    </footer>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

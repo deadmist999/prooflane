@@ -1,4 +1,5 @@
 import http from 'node:http';
+import { readFile } from 'node:fs/promises';
 import { createContract, attachAuthorization, recordAssessment, releaseDecision, demoAssess } from './proof-engine.js';
 import { PayPalClient } from './paypal-client.js';
 import { AiVerifier } from './ai-verifier.js';
@@ -16,6 +17,12 @@ const ai = new AiVerifier({
   model: process.env.AI_MODEL,
 });
 
+const staticFiles = new Map([
+  ['/', { path: new URL('../public/index.html', import.meta.url), type: 'text/html; charset=utf-8' }],
+  ['/app.js', { path: new URL('../public/app.js', import.meta.url), type: 'text/javascript; charset=utf-8' }],
+  ['/styles.css', { path: new URL('../public/styles.css', import.meta.url), type: 'text/css; charset=utf-8' }],
+]);
+
 async function readJson(request) {
   const chunks = [];
   for await (const chunk of request) chunks.push(chunk);
@@ -27,9 +34,21 @@ function send(response, status, body) {
   response.end(JSON.stringify(body, null, 2));
 }
 
+async function sendStatic(response, file) {
+  const body = await readFile(file.path);
+  response.writeHead(200, {
+    'Content-Type': file.type,
+    'Cache-Control': 'no-store',
+  });
+  response.end(body);
+}
+
 async function handler(request, response) {
   try {
     const url = new URL(request.url, 'http://localhost');
+    if (request.method === 'GET' && staticFiles.has(url.pathname)) {
+      return await sendStatic(response, staticFiles.get(url.pathname));
+    }
     if (request.method === 'GET' && url.pathname === '/health') {
       return send(response, 200, {
         ok: true,
