@@ -4,6 +4,10 @@
 
 Evidence-gated milestone payments for AI-assisted work. Prooflane turns acceptance checks and submitted evidence into an auditable assessment, then captures a PayPal authorization only when deterministic release policy passes.
 
+**Demo video (1:36):** https://youtu.be/Vmv-QBGG5sQ
+
+[![Prooflane demo](https://img.youtube.com/vi/Vmv-QBGG5sQ/maxresdefault.jpg)](https://youtu.be/Vmv-QBGG5sQ)
+
 This is an early hackathon MVP. It uses PayPal's sandbox only and never spends real money.
 
 ## Run

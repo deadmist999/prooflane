@@ -65,7 +65,7 @@ The next version would add durable contracts, signed evidence artifacts, human r
 
 - Source and run instructions: https://github.com/deadmist999/prooflane
 - Functional demo: run locally from the public repository
-- Demo video: YOUTUBE_URL
+- Demo video: https://youtu.be/Vmv-QBGG5sQ
 
 ## Disclosure
 
